@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios'; // Don't forget to install axios
+import axios from 'axios';
 
 function App() {
-  const [flashcardSets, setFlashcardSets] = useState([]); // State to store fetched flashcard sets
+  const [flashcardSets, setFlashcardSets] = useState([]);
   const [newSet, setNewSet] = useState({
     title: '',
     description: '',
     cards: [{ term: '', definition: '', starred: false }]
-  }); // State for the new flashcard set form
+  });
 
   useEffect(() => {
     fetchSets();
   }, []);
 
-  // Function to fetch flashcard sets from the server
   const fetchSets = async () => {
     try {
       const response = await axios.get('http://localhost:5000/flashcard_sets');
@@ -23,12 +22,10 @@ function App() {
     }
   };
 
-  // Function to handle input changes for set title and description
   const handleInputChange = (e) => {
     setNewSet({ ...newSet, [e.target.name]: e.target.value });
   };
 
-  // Function to handle card changes within a new set
   const handleCardChange = (index, event) => {
     const updatedCards = newSet.cards.map((card, i) => {
       if (i === index) {
@@ -36,37 +33,25 @@ function App() {
       }
       return card;
     });
-
     setNewSet({ ...newSet, cards: updatedCards });
   };
 
-  // Function to handle changes to cards in existing sets
   const handleExistingCardChange = (setIndex, cardIndex, field, value) => {
     const updatedSets = [...flashcardSets];
     updatedSets[setIndex].cards[cardIndex][field] = value;
     setFlashcardSets(updatedSets);
   };
 
-  // Function to add a new card to the current set form
   const addCard = () => {
     const newCard = { term: '', definition: '', starred: false };
     setNewSet({ ...newSet, cards: [...newSet.cards, newCard] });
   };
 
-  // Function to remove a card from the new set form
   const removeCard = index => {
     const filteredCards = newSet.cards.filter((_, i) => i !== index);
     setNewSet({ ...newSet, cards: filteredCards });
   };
 
-  // Function to remove a card from an existing set
-  const removeExistingCard = (setIndex, cardIndex) => {
-    const updatedSets = [...flashcardSets];
-    updatedSets[setIndex].cards.splice(cardIndex, 1);
-    setFlashcardSets(updatedSets);
-  };
-
-  // Function to delete a flashcard set
   const deleteSet = async (setId) => {
     try {
       await axios.delete(`http://localhost:5000/flashcard_sets/${setId}`);
@@ -76,7 +61,6 @@ function App() {
     }
   };
 
-  // Function to update a flashcard set
   const updateSet = async (setId, index) => {
     const setToUpdate = flashcardSets[index];
     try {
@@ -89,7 +73,64 @@ function App() {
     }
   };
 
-  // Function to handle form submission for new sets
+  const addNewCardToSet = async (setId) => {
+    const newCard = { term: 'New Term', definition: 'New Definition', starred: false };
+    try {
+        const response = await axios.post(`http://localhost:5000/flashcard_sets/${setId}/cards`, newCard);
+        const updatedSets = flashcardSets.map(set => {
+            if (set._id === setId) {
+                return { ...set, cards: [...set.cards, response.data] };  // response.data includes the _id
+            }
+            return set;
+        });
+        setFlashcardSets(updatedSets);
+    } catch (error) {
+        console.error('Failed to add new card: ', error);
+    }
+};
+
+  const updateCard = async (setId, cardId, cardIndex, setIndex) => {
+    if (!cardId) {
+      console.error("Card ID is undefined, cannot update.");
+      return;
+    }
+    const cardToUpdate = flashcardSets[setIndex].cards[cardIndex];
+    try {
+      const response = await axios.patch(`http://localhost:5000/flashcard_sets/${setId}/cards/${cardId}`, cardToUpdate);
+      const updatedSets = [...flashcardSets];
+      updatedSets[setIndex].cards[cardIndex] = response.data;
+      setFlashcardSets(updatedSets);
+    } catch (error) {
+      console.error('Failed to update card: ', error);
+    }
+  };
+
+  const deleteCard = async (setId, cardId, setIndex, cardIndex) => {
+    try {
+        // Ensure both setId and cardId are available
+        if (!setId || !cardId) {
+            console.error("Missing set ID or card ID.");
+            return;  // Exit the function if no setId or cardId
+        }
+
+        const response = await axios.delete(`http://localhost:5000/flashcard_sets/${setId}/cards/${cardId}`);
+
+        if (response.status === 204) {  // Check if the delete operation was successful
+            const updatedSets = [...flashcardSets];
+            if (updatedSets[setIndex] && updatedSets[setIndex].cards && updatedSets[setIndex].cards.length > cardIndex) {
+                updatedSets[setIndex].cards.splice(cardIndex, 1);
+                setFlashcardSets(updatedSets);
+            } else {
+                console.error("Card or set index out of bounds."); // Log if indices are incorrect
+            }
+        } else {
+            console.error("Failed to delete card on the server, status code:", response.status);
+        }
+    } catch (error) {
+        console.error('Failed to delete card: ', error);
+    }
+};
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -151,10 +192,11 @@ function App() {
             <strong>{set.title}</strong> - {set.description}
             <button onClick={() => deleteSet(set._id)}>Delete Set</button>
             <button onClick={() => updateSet(set._id, index)}>Save Changes</button>
+            <button onClick={() => addNewCardToSet(set._id)}>Add New Card</button>
             {set.cards && set.cards.length > 0 && (
               <ul>
                 {set.cards.map((card, cardIndex) => (
-                  <li key={card._id}>
+                  <li key={card._id || cardIndex}>
                     <input
                       type="text"
                       value={card.term}
@@ -167,7 +209,8 @@ function App() {
                       onChange={(e) => handleExistingCardChange(index, cardIndex, 'definition', e.target.value)}
                       required
                     />
-                    <button type="button" onClick={() => removeExistingCard(index, cardIndex)}>Remove Card</button>
+                    <button onClick={() => updateCard(set._id, card._id, cardIndex, index)}>Save Card</button>
+                    <button onClick={() => deleteCard(set._id, card._id, index, cardIndex)}>Remove Card</button>
                   </li>
                 ))}
               </ul>
