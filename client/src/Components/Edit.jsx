@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
-function Edit({ onSave, onCancel }) {
+function Edit({ onSave }) {
   const [data, setData] = useState({ title: '', description: '', cards: [] });
   const { setId } = useParams();
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ function Edit({ onSave, onCancel }) {
     try {
       const response = await method(url, data);
       onSave(response.data, isEdit);
-      navigate('/');  // Go back to the home page after save
+      navigate('/'); 
     } catch (error) {
       console.error('Failed to save the set:', error);
     }

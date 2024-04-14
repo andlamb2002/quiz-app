@@ -21,7 +21,6 @@ function View() {
     const handleInputChange = async (card, field, value) => {
         const updatedCard = { ...card, [field]: value };
         try {
-            // Directly await the promise without assigning its result
             await axios.patch(`http://localhost:5000/flashcard_sets/${setId}/cards/${card._id}`, updatedCard);
             setFlashcardSet({
                 ...flashcardSet,

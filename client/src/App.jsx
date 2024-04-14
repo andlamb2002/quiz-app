@@ -35,10 +35,6 @@ function App() {
         setFlashcardSets(updatedSets);
     };
 
-    const handleCancel = () => {
-        // Optionally handle any cleanup or redirection if necessary
-    };
-
     const handleDelete = async (id) => {
         try {
             await axios.delete(`http://localhost:5000/flashcard_sets/${id}`);
@@ -56,7 +52,7 @@ function App() {
                 </nav>
                 <Routes>
                     <Route path="/" element={<Home flashcardSets={flashcardSets} onAddNew={handleAddNew} onEdit={handleEdit} onDelete={handleDelete} />} exact />
-                    <Route path="/edit/:setId" element={<Edit onSave={handleSave} onCancel={handleCancel} />} />
+                    <Route path="/edit/:setId" element={<Edit onSave={handleSave} />} />
                     <Route path="/view/:setId" element={<View />} />
                 </Routes>
             </div>
