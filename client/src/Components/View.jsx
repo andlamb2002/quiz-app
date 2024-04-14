@@ -30,7 +30,19 @@ function View() {
             console.error('Failed to update card:', error);
         }
     };
-    
+
+    const toggleStarred = async (card) => {
+        const updatedCard = { ...card, starred: !card.starred };
+        try {
+            await axios.patch(`http://localhost:5000/flashcard_sets/${setId}/cards/${card._id}`, updatedCard);
+            setFlashcardSet({
+                ...flashcardSet,
+                cards: flashcardSet.cards.map(c => c._id === card._id ? { ...c, starred: !c.starred } : c)
+            });
+        } catch (error) {
+            console.error('Failed to toggle starred status:', error);
+        }
+    };
 
     const handleAddCard = async () => {
         const newCard = { term: 'New Term', definition: 'New Definition', starred: false };
@@ -83,6 +95,14 @@ function View() {
                                 value={card.definition} 
                                 onChange={(e) => handleInputChange(card, 'definition', e.target.value)} 
                                 placeholder="Enter definition"
+                            />
+                        </div>
+                        <div>
+                            <label>Starred:</label>
+                            <input 
+                                type="checkbox" 
+                                checked={card.starred} 
+                                onChange={() => toggleStarred(card)} 
                             />
                         </div>
                         <button onClick={() => handleDeleteCard(card._id)}>Delete Card</button>

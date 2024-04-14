@@ -35,6 +35,16 @@ function Edit({ onSave }) {
     setData({ ...data, cards: newCards });
   };
 
+  const handleToggleStar = (index) => {
+    const newCards = data.cards.map((card, i) => {
+      if (i === index) {
+        return { ...card, starred: !card.starred };  
+      }
+      return card;
+    });
+    setData({ ...data, cards: newCards });
+  };
+
   const addCard = () => {
     const newCards = [...data.cards, { term: '', definition: '', starred: false }];
     setData({ ...data, cards: newCards });
@@ -54,7 +64,7 @@ function Edit({ onSave }) {
     try {
       const response = await method(url, data);
       onSave(response.data, isEdit);
-      navigate('/'); 
+      navigate('/');  
     } catch (error) {
       console.error('Failed to save the set:', error);
     }
@@ -84,6 +94,14 @@ function Edit({ onSave }) {
               placeholder="Definition"
               required
             />
+            <label>
+              Starred:
+              <input
+                type="checkbox"
+                checked={card.starred}
+                onChange={() => handleToggleStar(index)}  
+              />
+            </label>
             <button type="button" onClick={() => removeCard(index)}>Remove Card</button>
           </div>
         ))}
