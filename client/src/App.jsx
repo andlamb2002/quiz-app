@@ -49,6 +49,7 @@ function App() {
             <div>
                 <nav>
                     <Link to="/">Home</Link>
+                    <button onClick={handleAddNew} style={{marginLeft: "10px"}}>Add New Set</button>
                 </nav>
                 <Routes>
                     <Route path="/" element={<Home flashcardSets={flashcardSets} onAddNew={handleAddNew} onEdit={handleEdit} onDelete={handleDelete} />} exact />

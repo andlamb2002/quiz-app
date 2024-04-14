@@ -5,7 +5,6 @@ function Home({ flashcardSets, onAddNew, onEdit, onDelete }) {
   return (
     <div>
       <h1>Flashcard Sets</h1>
-      <button onClick={onAddNew}>Add New Set</button>
       <ul>
         {flashcardSets.map(set => (
           <li key={set._id}>
