@@ -73,6 +73,20 @@ app.get('/flashcard_sets', async (req, res) => {
     }
 });
 
+app.get('/flashcard_sets/:id', async (req, res) => {
+    const { id } = req.params;  // Extract the ID from the URL parameter
+    try {
+        const flashcardSet = await FlashcardSet.findById(id);  // Use mongoose to find by ID
+        if (!flashcardSet) {
+            return res.status(404).send('Flashcard set not found');  // Return 404 if no set is found
+        }
+        res.send(flashcardSet);  // Send the found flashcard set
+    } catch (error) {
+        console.error('Failed to fetch flashcard set:', error);
+        res.status(500).send('Internal Server Error');  // Handle possible errors
+    }
+});
+
 app.patch('/flashcard_sets/:id', async (req, res) => {
     const updates = req.body; // the updates could include any combination of title, description, and cards
     try {
