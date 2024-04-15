@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import Flashcard from './Flashcard'; // Make sure this path is correct based on your project structure
 
 function View() {
     const { setId } = useParams();
@@ -76,6 +77,7 @@ function View() {
     return (
         <div>
             <h1>Viewing {flashcardSet.title}</h1>
+            <Flashcard cards={flashcardSet.cards} />
             <ul>
                 {flashcardSet.cards.map((card, index) => (
                     <li key={card._id || index}>
