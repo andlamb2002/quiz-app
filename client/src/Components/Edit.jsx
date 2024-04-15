@@ -4,6 +4,7 @@ import axios from 'axios';
 
 function Edit({ onSave }) {
   const [data, setData] = useState({ title: '', description: '', cards: [] });
+  const [error, setError] = useState(false);  
   const { setId } = useParams();
   const navigate = useNavigate();
 
@@ -12,9 +13,15 @@ function Edit({ onSave }) {
       if (setId !== 'new') {
         try {
           const response = await axios.get(`http://localhost:5000/flashcard_sets/${setId}`);
-          setData(response.data);
+          if (response.data) {
+            setData(response.data);
+            setError(false);  
+          } else {
+            setError(true); 
+          }
         } catch (error) {
           console.error('Error fetching set data:', error);
+          setError(true);  
         }
       }
     };
@@ -38,7 +45,7 @@ function Edit({ onSave }) {
   const handleToggleStar = (index) => {
     const newCards = data.cards.map((card, i) => {
       if (i === index) {
-        return { ...card, starred: !card.starred };  
+        return { ...card, starred: !card.starred };
       }
       return card;
     });
@@ -60,15 +67,19 @@ function Edit({ onSave }) {
     const isEdit = setId !== 'new';
     const method = isEdit ? axios.patch : axios.post;
     const url = isEdit ? `http://localhost:5000/flashcard_sets/${setId}` : 'http://localhost:5000/flashcard_sets';
-  
+
     try {
       const response = await method(url, data);
       onSave(response.data, isEdit);
-      navigate('/');  
+      navigate('/');
     } catch (error) {
       console.error('Failed to save the set:', error);
     }
   };
+
+  if (error) {
+    return <div>Set not found</div>;
+  }
 
   return (
     <div>
@@ -99,7 +110,7 @@ function Edit({ onSave }) {
               <input
                 type="checkbox"
                 checked={card.starred}
-                onChange={() => handleToggleStar(index)}  
+                onChange={() => handleToggleStar(index)}
               />
             </label>
             <button type="button" onClick={() => removeCard(index)}>Delete Card</button>
@@ -107,7 +118,7 @@ function Edit({ onSave }) {
         ))}
         <button type="button" onClick={addCard}>Add Card</button>
         <button type="submit">Save</button>
-        <button type="button" onClick={() => navigate('/')}>Cancel</button>  
+        <button type="button" onClick={() => navigate('/')}>Cancel</button>
       </form>
     </div>
   );

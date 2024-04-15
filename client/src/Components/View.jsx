@@ -71,7 +71,7 @@ function View() {
     };
 
     if (!flashcardSet) {
-        return <div>Loading... or flashcard set not found</div>;
+        return <div>Loading...</div>;
     }
 
     return (

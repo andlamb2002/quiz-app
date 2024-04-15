@@ -23,7 +23,7 @@ function Flashcard({ cards }) {
     };
 
     if (!cards.length) {
-        return <div>No cards available</div>;
+        return <div>This set has no cards</div>;
     }
 
     const card = cards[currentIndex];
