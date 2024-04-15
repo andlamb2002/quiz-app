@@ -102,7 +102,7 @@ function Edit({ onSave }) {
                 onChange={() => handleToggleStar(index)}  
               />
             </label>
-            <button type="button" onClick={() => removeCard(index)}>Remove Card</button>
+            <button type="button" onClick={() => removeCard(index)}>Delete Card</button>
           </div>
         ))}
         <button type="button" onClick={addCard}>Add Card</button>

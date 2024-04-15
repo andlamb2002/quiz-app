@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
-import Flashcard from './Flashcard'; // Make sure this path is correct based on your project structure
+import Flashcard from './Flashcard'; 
 
 function View() {
     const { setId } = useParams();
@@ -111,7 +111,7 @@ function View() {
                     </li>
                 ))}
             </ul>
-            <button onClick={handleAddCard}>Add New Card</button>
+            <button onClick={handleAddCard}>Add Card</button>
         </div>
     );
 }
