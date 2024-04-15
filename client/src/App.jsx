@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './Components/Home';
 import Edit from './Components/Edit';
 import View from './Components/View';
+import Header from './Components/Header';
 import axios from 'axios';
 
 function App() {
@@ -48,8 +49,7 @@ function App() {
         <Router>
             <div>
                 <nav>
-                    <Link to="/">Home</Link>
-                    <button onClick={handleAddNew} style={{marginLeft: "10px"}}>Create Set</button>
+                    <Header flashcardSets={flashcardSets} />
                 </nav>
                 <Routes>
                     <Route path="/" element={<Home flashcardSets={flashcardSets} onAddNew={handleAddNew} onEdit={handleEdit} onDelete={handleDelete} />} exact />
