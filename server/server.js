@@ -1,10 +1,59 @@
+require('dotenv').config();  // This line loads the environment variables from your .env file
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+// const { Configuration, OpenAIApi } = require('openai');
 
 const app = express();
 app.use(cors()); // Enable CORS for all origins
 app.use(express.json()); // Middleware to parse JSON bodies
+
+// const configuration = new Configuration({
+//     apiKey: process.env.OPENAI_API_KEY
+// });
+// const openai = new OpenAIApi(configuration);
+
+app.post('/test', async (req, res) => {
+    try {
+        const response = await openai.createCompletion({
+            model: "text-ada-001",
+            prompt: "Hello, world!",
+            max_tokens: 5
+        });
+        res.json(response.data.choices[0].text);
+    } catch (error) {
+        console.error("Failed to communicate with OpenAI:", error);
+        res.status(500).send("Error communicating with OpenAI.");
+    }
+});
+
+// async function generateDistractors(text) {
+//     const response = await openai.createCompletion({
+//         model: "text-ada-001",
+//         prompt: `Generate three plausible distractors for the following definition:\n${text}`,
+//         max_tokens: 150,
+//         n: 3,
+//         stop: ["\n"],
+//         temperature: 0.7
+//     });
+
+//     return response.data.choices.map(choice => choice.text.trim());
+// }
+
+// app.post('/generate-distractors', async (req, res) => {
+//     const { text } = req.body;
+//     if (!text) {
+//         return res.status(400).send('Text definition is required.');
+//     }
+
+//     try {
+//         const distractors = await generateDistractors(text);
+//         res.json({ distractors });
+//     } catch (error) {
+//         console.error("Error generating distractors:", error);
+//         res.status(500).send('Failed to generate distractors.');
+//     }
+// });
 
 const flashcardSchema = new mongoose.Schema({
     term: { type: String, required: true },
