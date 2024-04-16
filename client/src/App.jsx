@@ -47,15 +47,17 @@ function App() {
 
     return (
         <Router>
-            <div>
-                <nav>
+            <div className="flex flex-col h-screen">
+                <nav className="bg-bg1">
                     <Header flashcardSets={flashcardSets} />
                 </nav>
-                <Routes>
-                    <Route path="/" element={<Home flashcardSets={flashcardSets} onAddNew={handleAddNew} onEdit={handleEdit} onDelete={handleDelete} />} exact />
-                    <Route path="/edit/:setId" element={<Edit onSave={handleSave} />} />
-                    <Route path="/view/:setId" element={<View />} />
-                </Routes>
+                <div className="bg-bg1 flex-1 overflow-auto">
+                    <Routes>
+                        <Route path="/" element={<Home flashcardSets={flashcardSets} onAddNew={handleAddNew} onEdit={handleEdit} onDelete={handleDelete} />} exact />
+                        <Route path="/edit/:setId" element={<Edit onSave={handleSave} />} />
+                        <Route path="/view/:setId" element={<View />} />
+                    </Routes>
+                </div>
             </div>
         </Router>
     );

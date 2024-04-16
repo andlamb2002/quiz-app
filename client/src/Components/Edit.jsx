@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { MdAdd, MdDelete, MdSave, MdCancel } from 'react-icons/md'; 
 import axios from 'axios';
 
 function Edit({ onSave }) {
@@ -42,16 +43,6 @@ function Edit({ onSave }) {
     setData({ ...data, cards: newCards });
   };
 
-  const handleToggleStar = (index) => {
-    const newCards = data.cards.map((card, i) => {
-      if (i === index) {
-        return { ...card, starred: !card.starred };
-      }
-      return card;
-    });
-    setData({ ...data, cards: newCards });
-  };
-
   const addCard = () => {
     const newCards = [...data.cards, { term: '', definition: '', starred: false }];
     setData({ ...data, cards: newCards });
@@ -78,48 +69,58 @@ function Edit({ onSave }) {
   };
 
   if (error) {
-    return <div>Set not found</div>;
+    return <div className="text-white">Set not found</div>;
   }
 
   return (
-    <div>
-      <h1>{setId === 'new' ? 'New Flashcard Set' : 'Edit Flashcard Set'}</h1>
-      <form onSubmit={handleSubmit}>
-        <input type="text" name="title" value={data.title} onChange={handleChange} placeholder="Title" required />
-        <input type="text" name="description" value={data.description} onChange={handleChange} placeholder="Description" required />
-        {data.cards.map((card, index) => (
-          <div key={index}>
-            <input
-              type="text"
-              name="term"
-              value={card.term}
-              onChange={(e) => handleCardChange(index, e)}
-              placeholder="Term"
-              required
-            />
-            <input
-              type="text"
-              name="definition"
-              value={card.definition}
-              onChange={(e) => handleCardChange(index, e)}
-              placeholder="Definition"
-              required
-            />
-            <label>
-              Starred:
-              <input
-                type="checkbox"
-                checked={card.starred}
-                onChange={() => handleToggleStar(index)}
-              />
-            </label>
-            <button type="button" onClick={() => removeCard(index)}>Delete Card</button>
+    <div className="bg-bg1 flex justify-center items-start pt-10">
+      <div className="w-3/5">
+        <h1 className="text-white text-2xl mb-4">{setId === 'new' ? 'New Flashcard Set' : 'Edit Flashcard Set'}</h1>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <input type="text" name="title" value={data.title} onChange={handleChange} placeholder="Title" required className="w-full p-2 bg-bg2 text-white rounded" />
+          <input type="text" name="description" value={data.description} onChange={handleChange} placeholder="Description" required className="w-full p-2 bg-bg2 text-white rounded" />
+          
+          <div className="space-y-4">
+            <div className="text-white text-lg mb-2">Terms</div>
+            {data.cards.map((card, index) => (
+              <div key={index} className="bg-bg2 rounded p-4 relative">
+                <input
+                  type="text"
+                  name="term"
+                  value={card.term}
+                  onChange={(e) => handleCardChange(index, e)}
+                  placeholder="Term"
+                  required
+                  className="w-2/5 p-2 bg-bg2 text-white rounded mr-2"
+                />
+                <input
+                  type="text"
+                  name="definition"
+                  value={card.definition}
+                  onChange={(e) => handleCardChange(index, e)}
+                  placeholder="Definition"
+                  required
+                  className="w-2/5 p-2 bg-bg2 text-white rounded"
+                />
+                <button type="button" onClick={() => removeCard(index)} className="absolute right-0 top-0 text-white p-2">
+                  <MdDelete className="h-6 w-6" />
+                </button>
+              </div>
+            ))}
+            <button type="button" onClick={addCard} className="w-full py-2 bg-button text-white rounded flex justify-center items-center">
+              <MdAdd className="h-6 w-6 mr-2" /> Add Card
+            </button>
           </div>
-        ))}
-        <button type="button" onClick={addCard}>Add Card</button>
-        <button type="submit">Save</button>
-        <button type="button" onClick={() => navigate('/')}>Cancel</button>
-      </form>
+          <div className="flex justify-between">
+            <button type="button" onClick={() => navigate('/')} className="bg-red-button text-white py-2 px-4 rounded flex items-center">
+              <MdCancel className="h-6 w-6 mr-2" /> Cancel
+            </button>
+            <button type="submit" className="bg-button text-white py-2 px-4 rounded flex items-center">
+              <MdSave className="h-6 w-6 mr-2" /> Save
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

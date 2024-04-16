@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
-import Flashcard from './Flashcard'; 
+import Flashcard from './Flashcard';
+import { MdStarBorder, MdStar, MdEdit } from 'react-icons/md';
 
 function View() {
     const { setId } = useParams();
@@ -19,29 +20,43 @@ function View() {
         fetchData();
     }, [setId]);
 
-    const handleInputChange = async (card, field, value) => {
-        const updatedCard = { ...card, [field]: value };
+    const handleInputChange = async (cardId, field, value) => {
+        const originalValue = flashcardSet.cards.find(c => c._id === cardId)[field];
+    
+        setFlashcardSet(prev => ({
+            ...prev,
+            cards: prev.cards.map(c => c._id === cardId ? { ...c, [field]: value } : c)
+        }));
+    
         try {
-            await axios.patch(`http://localhost:5000/flashcard_sets/${setId}/cards/${card._id}`, updatedCard);
-            setFlashcardSet({
-                ...flashcardSet,
-                cards: flashcardSet.cards.map(c => c._id === card._id ? { ...c, [field]: value } : c)
+            await axios.patch(`http://localhost:5000/flashcard_sets/${setId}/cards/${cardId}`, {
+                [field]: value
             });
         } catch (error) {
             console.error('Failed to update card:', error);
+            setFlashcardSet(prev => ({
+                ...prev,
+                cards: prev.cards.map(c => c._id === cardId ? { ...c, [field]: originalValue } : c)
+            }));
         }
     };
 
     const toggleStarred = async (card) => {
-        const updatedCard = { ...card, starred: !card.starred };
+        setFlashcardSet(prev => ({
+            ...prev,
+            cards: prev.cards.map(c => c._id === card._id ? { ...c, starred: !c.starred } : c)
+        }));
+
         try {
-            await axios.patch(`http://localhost:5000/flashcard_sets/${setId}/cards/${card._id}`, updatedCard);
-            setFlashcardSet({
-                ...flashcardSet,
-                cards: flashcardSet.cards.map(c => c._id === card._id ? { ...c, starred: !c.starred } : c)
+            await axios.patch(`http://localhost:5000/flashcard_sets/${setId}/cards/${card._id}`, {
+                starred: !card.starred
             });
         } catch (error) {
             console.error('Failed to toggle starred status:', error);
+            setFlashcardSet(prev => ({
+                ...prev,
+                cards: prev.cards.map(c => c._id === card._id ? { ...c, starred: card.starred } : c)
+            }));
         }
     };
 
@@ -49,69 +64,63 @@ function View() {
         const newCard = { term: 'New Term', definition: 'New Definition', starred: false };
         try {
             const response = await axios.post(`http://localhost:5000/flashcard_sets/${setId}/cards`, newCard);
-            setFlashcardSet({
-                ...flashcardSet,
-                cards: [...flashcardSet.cards, response.data]
-            });
+            setFlashcardSet(prev => ({
+                ...prev,
+                cards: [...prev.cards, response.data]
+            }));
         } catch (error) {
             console.error('Failed to add new card:', error);
         }
     };
 
-    const handleDeleteCard = async (cardId) => {
-        try {
-            await axios.delete(`http://localhost:5000/flashcard_sets/${setId}/cards/${cardId}`);
-            setFlashcardSet({
-                ...flashcardSet,
-                cards: flashcardSet.cards.filter(c => c._id !== cardId)
-            });
-        } catch (error) {
-            console.error('Failed to delete card:', error);
-        }
-    };
-
     if (!flashcardSet) {
-        return <div>Loading...</div>;
+        return <div className="text-white">Loading...</div>;
     }
 
     return (
-        <div>
-            <h1>Viewing {flashcardSet.title}</h1>
-            <Flashcard cards={flashcardSet.cards} />
-            <ul>
-                {flashcardSet.cards.map((card, index) => (
-                    <li key={card._id || index}>
-                        <div>
-                            <label>Term:</label>
+        <div className="flex flex-col">
+            <div className="flex-grow">
+                <Flashcard cards={flashcardSet.cards} />
+            </div>
+            <div className="w-3/5 mx-auto p-4">
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-white text-2xl">{flashcardSet.title}</h2>
+                    <Link to={`/edit/${setId}`} className="bg-button text-white py-2 px-4 rounded flex items-center">
+                        <MdEdit className="h-6 w-6 mr-2" /> Edit Set
+                    </Link>
+                </div>
+                <p className="text-white">{flashcardSet.description}</p>
+            </div>
+            <ul className="divide-y divide-gray-700 w-3/5 mx-auto">
+                {flashcardSet.cards.map((card) => (
+                    <li key={card._id} className="bg-bg2 p-4 flex justify-between items-center">
+                        <div className="flex-grow">
                             <input 
+                                className="text-white bg-transparent p-1 mr-2"
                                 type="text" 
                                 value={card.term} 
-                                onChange={(e) => handleInputChange(card, 'term', e.target.value)} 
+                                onChange={(e) => handleInputChange(card._id, 'term', e.target.value)} 
                                 placeholder="Enter term"
                             />
-                        </div>
-                        <div>
-                            <label>Definition:</label>
                             <input 
+                                className="text-white bg-transparent p-1"
                                 type="text" 
                                 value={card.definition} 
-                                onChange={(e) => handleInputChange(card, 'definition', e.target.value)} 
+                                onChange={(e) => handleInputChange(card._id, 'definition', e.target.value)} 
                                 placeholder="Enter definition"
                             />
                         </div>
-                        <div>
-                            <label>Starred:</label>
-                            <input 
-                                type="checkbox" 
-                                checked={card.starred} 
-                                onChange={() => toggleStarred(card)} 
-                            />
-                        </div>
-                        <button onClick={() => handleDeleteCard(card._id)}>Delete Card</button>
+                        <button onClick={() => toggleStarred(card)} className="text-button">
+                            {card.starred ? <MdStar className="h-6 w-6" /> : <MdStarBorder className="h-6 w-6" />}
+                        </button>
                     </li>
                 ))}
             </ul>
-            <button onClick={handleAddCard}>Add Card</button>
+            <div className="w-3/5 mx-auto">
+                <button onClick={handleAddCard} className="bg-button text-white py-2 px-4 rounded m-4">
+                    Add Card
+                </button>
+            </div>
         </div>
     );
 }

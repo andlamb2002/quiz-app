@@ -19,12 +19,17 @@ const Header = ({ flashcardSets }) => {
     };
 
     return (
-        <nav style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 20px' }}>
-            <Link to="/">
-                <img src={logo} alt="Home" style={{ width: '100px' }} /> 
+        <nav className="flex items-center justify-between bg-bg">
+            <Link to="/" className="shrink-0">
+                <img src={logo} alt="Home" className="w-24" /> 
             </Link>
-            <h1>{getTitle()}</h1>
-            <button onClick={() => window.location.href = '/edit/new'}>Create Set</button>
+            <h1 className="text-white text-xl">{getTitle()}</h1> 
+            <button 
+                className="bg-button text-white rounded" 
+                onClick={() => window.location.href = '/edit/new'}
+            >
+                Create Set
+            </button>
         </nav>
     );
 };
