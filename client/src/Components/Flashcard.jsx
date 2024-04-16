@@ -51,7 +51,7 @@ function Flashcard({ cards }) {
     return (
         <div className="bg-bg1 flex flex-col items-center pt-10">
             <div className="w-3/5 bg-bg2 p-8 rounded-lg shadow-lg relative cursor-pointer" onClick={handleCardClick}>
-                <div className="text-white text-center text-2xl">
+                <div className="text-white text-center text-2xl my-20">
                     {showTerm ? card.term : card.definition}
                 </div>
             </div>
@@ -65,7 +65,7 @@ function Flashcard({ cards }) {
                 </button>
             </div>
             <button onClick={handleShuffle} className="bg-button text-white py-2 px-4 rounded flex items-center mb-4">
-                <MdShuffle className="h-6 w-6 mr-2" /> Shuffle
+                <MdShuffle className="h-8 w-8 mr-2" /> Shuffle
             </button>
         </div>
     );

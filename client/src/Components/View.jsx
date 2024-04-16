@@ -82,16 +82,16 @@ function View() {
             <div className="flex-grow">
                 <Flashcard cards={flashcardSet.cards} />
             </div>
-            <div className="w-3/5 mx-auto p-4">
+            <div className="w-3/5 mx-auto">
                 <div className="flex justify-between items-center mb-4">
                     <h2 className="text-white text-2xl">{flashcardSet.title}</h2>
                     <Link to={`/edit/${setId}`} className="bg-button text-white py-2 px-4 rounded flex items-center">
-                        <MdEdit className="h-6 w-6 mr-2" /> Edit Set
+                        <MdEdit className="h-8 w-8 mr-2" /> Edit Set
                     </Link>
                 </div>
                 <p className="text-white">{flashcardSet.description}</p>
             </div>
-            <ul className="divide-y divide-gray-700 w-3/5 mx-auto">
+            <ul className="divide-y divide-bg w-3/5 mx-auto">
                 {flashcardSet.cards.map((card) => (
                     <li key={card._id} className="bg-bg2 p-4 flex justify-between items-center">
                         <div className="flex-grow">
@@ -111,12 +111,12 @@ function View() {
                             />
                         </div>
                         <button onClick={() => toggleStarred(card)} className="text-button">
-                            {card.starred ? <MdStar className="h-6 w-6" /> : <MdStarBorder className="h-6 w-6" />}
+                            {card.starred ? <MdStar className="h-8 w-8" /> : <MdStarBorder className="h-8 w-8" />}
                         </button>
                     </li>
                 ))}
             </ul>
-            <div className="w-3/5 mx-auto">
+            <div className="mx-auto">
                 <button onClick={handleAddCard} className="bg-button text-white py-2 px-4 rounded m-4">
                     Add Card
                 </button>
