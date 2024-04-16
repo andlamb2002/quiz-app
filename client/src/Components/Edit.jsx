@@ -73,7 +73,7 @@ function Edit({ onSave }) {
   }
 
   return (
-    <div className="bg-bg1 flex justify-center items-start pt-10">
+    <div className="bg-bg1 flex justify-center items-start pt-10 pb-4">
       <div className="w-3/5">
         <h1 className="text-white text-2xl mb-4">{setId === 'new' ? 'New Flashcard Set' : 'Edit Flashcard Set'}</h1>
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -103,20 +103,20 @@ function Edit({ onSave }) {
                   className="w-2/5 p-2 bg-bg2 text-white rounded"
                 />
                 <button type="button" onClick={() => removeCard(index)} className="absolute right-0 top-0 text-white p-2">
-                  <MdDelete className="h-6 w-6" />
+                  <MdDelete className="h-8 w-8" />
                 </button>
               </div>
             ))}
             <button type="button" onClick={addCard} className="w-full py-2 bg-button text-white rounded flex justify-center items-center">
-              <MdAdd className="h-6 w-6 mr-2" /> Add Card
+              <MdAdd className="h-8 w-8 mr-2" /> Add Card
             </button>
           </div>
           <div className="flex justify-between">
             <button type="button" onClick={() => navigate('/')} className="bg-red-button text-white py-2 px-4 rounded flex items-center">
-              <MdCancel className="h-6 w-6 mr-2" /> Cancel
+              <MdCancel className="h-8 w-8 mr-2" /> Cancel
             </button>
             <button type="submit" className="bg-button text-white py-2 px-4 rounded flex items-center">
-              <MdSave className="h-6 w-6 mr-2" /> Save
+              <MdSave className="h-8 w-8 mr-2" /> Save
             </button>
           </div>
         </form>
