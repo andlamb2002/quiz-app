@@ -75,15 +75,15 @@ function Edit({ onSave }) {
   return (
     <div className="bg-bg1 flex justify-center items-start pt-10 pb-4">
       <div className="w-3/5">
-        <h1 className="text-white text-2xl mb-4">{setId === 'new' ? 'New Flashcard Set' : 'Edit Flashcard Set'}</h1>
+        <h1 className="text-white text-3xl mb-4">{setId === 'new' ? 'New Flashcard Set' : 'Edit Flashcard Set'}</h1>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <input type="text" name="title" value={data.title} onChange={handleChange} placeholder="Title" required className="w-full p-2 bg-bg2 text-white rounded" />
-          <input type="text" name="description" value={data.description} onChange={handleChange} placeholder="Description" required className="w-full p-2 bg-bg2 text-white rounded" />
+          <input type="text" name="title" value={data.title} onChange={handleChange} placeholder="Title" required className="w-full p-2 bg-bg2 text-white text-xl shadow-lg rounded" />
+          <input type="text" name="description" value={data.description} onChange={handleChange} placeholder="Description" required className="w-full p-2 bg-bg2 text-white text-xl shadow-lg rounded" />
           
           <div className="space-y-4">
-            <div className="text-white text-lg mb-2">Terms</div>
+            <div className="text-white text-3xl mb-2">Terms</div>
             {data.cards.map((card, index) => (
-              <div key={index} className="bg-bg2 rounded p-4 relative">
+              <div key={index} className="bg-bg2 rounded p-4 relative shadow-lg">
                 <input
                   type="text"
                   name="term"
@@ -91,7 +91,7 @@ function Edit({ onSave }) {
                   onChange={(e) => handleCardChange(index, e)}
                   placeholder="Term"
                   required
-                  className="w-2/5 p-2 bg-bg2 text-white rounded mr-2"
+                  className="w-1/3 p-2 bg-bg2 text-white text-xl rounded mr-2"
                 />
                 <input
                   type="text"
@@ -100,22 +100,22 @@ function Edit({ onSave }) {
                   onChange={(e) => handleCardChange(index, e)}
                   placeholder="Definition"
                   required
-                  className="w-2/5 p-2 bg-bg2 text-white rounded"
+                  className="w-3/5 p-2 bg-bg2 text-white text-xl rounded"
                 />
                 <button type="button" onClick={() => removeCard(index)} className="absolute right-0 top-0 text-white p-2">
-                  <MdDelete className="h-8 w-8" />
+                  <MdDelete className="h-8 w-8 hover:bg-opacity-75" />
                 </button>
               </div>
             ))}
-            <button type="button" onClick={addCard} className="w-full py-2 bg-button text-white rounded flex justify-center items-center">
+            <button type="button" onClick={addCard} className="w-full py-2 bg-button text-white text-xl rounded flex justify-center items-center shadow-lg hover:bg-opacity-75">
               <MdAdd className="h-8 w-8 mr-2" /> Add Card
             </button>
           </div>
           <div className="flex justify-between">
-            <button type="button" onClick={() => navigate('/')} className="bg-red-button text-white py-2 px-4 rounded flex items-center">
+            <button type="button" onClick={() => navigate('/')} className="bg-red-button text-white text-xl py-2 px-4 rounded flex items-center shadow-lg hover:bg-opacity-75">
               <MdCancel className="h-8 w-8 mr-2" /> Cancel
             </button>
-            <button type="submit" className="bg-button text-white py-2 px-4 rounded flex items-center">
+            <button type="submit" className="bg-button text-white text-xl py-2 px-4 rounded flex items-center shadow-lg hover:bg-opacity-75">
               <MdSave className="h-8 w-8 mr-2" /> Save
             </button>
           </div>

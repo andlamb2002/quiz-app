@@ -50,8 +50,8 @@ function Flashcard({ cards }) {
 
     return (
         <div className="bg-bg1 flex flex-col items-center pt-10">
-            <div className="w-3/5 bg-bg2 p-8 rounded-lg shadow-lg relative cursor-pointer" onClick={handleCardClick}>
-                <div className="text-white text-center text-2xl my-20">
+            <div className="w-3/5 bg-bg2 p-8 rounded-lg shadow-xl relative cursor-pointer" onClick={handleCardClick}>
+                <div className="text-white text-center text-5xl my-32">
                     {showTerm ? card.term : card.definition}
                 </div>
             </div>
@@ -59,12 +59,12 @@ function Flashcard({ cards }) {
                 <button onClick={handlePrev} disabled={currentIndex === 0} className="text-white">
                     <MdArrowBack className="h-8 w-8" />
                 </button>
-                <span className="text-white text-lg">{currentIndex + 1}/{shuffledCards.length}</span>
+                <span className="text-white text-xl">{currentIndex + 1}/{shuffledCards.length}</span>
                 <button onClick={handleNext} disabled={currentIndex === shuffledCards.length - 1} className="text-white">
                     <MdArrowForward className="h-8 w-8" />
                 </button>
             </div>
-            <button onClick={handleShuffle} className="bg-button text-white py-2 px-4 rounded flex items-center mb-4">
+            <button onClick={handleShuffle} className="bg-button text-white text-xl py-2 px-4 rounded flex items-center mb-4 shadow-lg hover:bg-opacity-75">
                 <MdShuffle className="h-8 w-8 mr-2" /> Shuffle
             </button>
         </div>

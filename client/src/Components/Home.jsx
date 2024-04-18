@@ -7,7 +7,7 @@ function Home({ flashcardSets, onEdit, onDelete }) {
     <div className="flex justify-center items-start pt-10">
       <ul className="space-y-4 w-3/5">
           {flashcardSets.map(set => (
-              <li key={set._id} className="flex justify-between items-center bg-bg2 p-4 rounded-lg shadow cursor-pointer">
+              <li key={set._id} className="flex justify-between items-center bg-bg2 p-4 rounded-lg shadow-lg cursor-pointer">
                   <Link to={`/view/${set._id}`} className="flex items-center space-x-4 flex-grow">
                       <strong className="text-white text-3xl mr-2">{set.title}</strong> 
                       <span className="text-white text-xl">{set.description}</span>

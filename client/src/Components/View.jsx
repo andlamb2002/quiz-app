@@ -84,26 +84,26 @@ function View() {
             </div>
             <div className="w-3/5 mx-auto">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-white text-2xl">{flashcardSet.title}</h2>
-                    <Link to={`/edit/${setId}`} className="bg-button text-white py-2 px-4 rounded flex items-center">
+                    <h2 className="text-white text-3xl">{flashcardSet.title}</h2>
+                    <Link to={`/edit/${setId}`} className="bg-button text-white text-xl py-2 px-4 rounded flex items-center shadow-lg">
                         <MdEdit className="h-8 w-8 mr-2" /> Edit Set
                     </Link>
                 </div>
-                <p className="text-white">{flashcardSet.description}</p>
+                <p className="text-white text-xl">{flashcardSet.description}</p>
             </div>
-            <ul className="divide-y divide-bg w-3/5 mx-auto">
+            <ul className="divide-y divide-bg w-3/5 mx-auto shadow-lg">
                 {flashcardSet.cards.map((card) => (
                     <li key={card._id} className="bg-bg2 p-4 flex justify-between items-center">
                         <div className="flex-grow">
                             <input 
-                                className="text-white bg-transparent p-1 mr-2"
+                                className="w-1/3 text-white text-xl bg-transparent p-1 mr-2"
                                 type="text" 
                                 value={card.term} 
                                 onChange={(e) => handleInputChange(card._id, 'term', e.target.value)} 
                                 placeholder="Enter term"
                             />
                             <input 
-                                className="text-white bg-transparent p-1"
+                                className="w-3/5 text-white text-xl bg-transparent p-1"
                                 type="text" 
                                 value={card.definition} 
                                 onChange={(e) => handleInputChange(card._id, 'definition', e.target.value)} 
@@ -117,7 +117,7 @@ function View() {
                 ))}
             </ul>
             <div className="mx-auto">
-                <button onClick={handleAddCard} className="bg-button text-white py-2 px-4 rounded m-4">
+                <button onClick={handleAddCard} className="bg-button text-white text-3xl py-2 px-4 rounded m-4 shadow-lg">
                     Add Card
                 </button>
             </div>
