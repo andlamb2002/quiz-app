@@ -1,59 +1,61 @@
-require('dotenv').config();  // This line loads the environment variables from your .env file
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-// const { Configuration, OpenAIApi } = require('openai');
+const axios = require('axios');
+const OpenAI = require('openai');
 
 const app = express();
-app.use(cors()); // Enable CORS for all origins
-app.use(express.json()); // Middleware to parse JSON bodies
+app.use(cors()); 
+app.use(express.json()); 
 
-// const configuration = new Configuration({
-//     apiKey: process.env.OPENAI_API_KEY
-// });
-// const openai = new OpenAIApi(configuration);
-
-app.post('/test', async (req, res) => {
-    try {
-        const response = await openai.createCompletion({
-            model: "text-ada-001",
-            prompt: "Hello, world!",
-            max_tokens: 5
-        });
-        res.json(response.data.choices[0].text);
-    } catch (error) {
-        console.error("Failed to communicate with OpenAI:", error);
-        res.status(500).send("Error communicating with OpenAI.");
-    }
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
 });
 
-// async function generateDistractors(text) {
-//     const response = await openai.createCompletion({
-//         model: "text-ada-001",
-//         prompt: `Generate three plausible distractors for the following definition:\n${text}`,
-//         max_tokens: 150,
-//         n: 3,
-//         stop: ["\n"],
-//         temperature: 0.7
-//     });
+app.post('/generate-answers', async (req, res) => {
+    const { term, definition } = req.body;
+    if (!term || !definition) {
+        return res.status(400).send("Please provide both term and definition.");
+    }
+    const query = `${term}\n${definition}`;
 
-//     return response.data.choices.map(choice => choice.text.trim());
-// }
+    try {
+        const apiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
+            model: "gpt-3.5-turbo",
+            messages: [
+                {"role": "system", "content": "With the given term and a definition, create 3 fake multiple choice answers based off of the definition:"},
+                {"role": "user", "content": query}
+            ],
+            temperature: 0.5,
+            max_tokens: 128,
+            top_p: 1,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+        }, {
+            headers: {
+                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
 
-// app.post('/generate-distractors', async (req, res) => {
-//     const { text } = req.body;
-//     if (!text) {
-//         return res.status(400).send('Text definition is required.');
-//     }
+        if (!apiResponse || !apiResponse.data || !apiResponse.data.choices || !apiResponse.data.choices.length) {
+            throw new Error("Invalid or empty API response");
+        }
 
-//     try {
-//         const distractors = await generateDistractors(text);
-//         res.json({ distractors });
-//     } catch (error) {
-//         console.error("Error generating distractors:", error);
-//         res.status(500).send('Failed to generate distractors.');
-//     }
-// });
+        const choices = apiResponse.data.choices;
+        const message = choices[0].message;
+        if (!message) {
+            throw new Error("Message object is undefined");
+        }
+
+        const answers = message.content;
+        res.json({question: query, answers: answers});
+    } catch (error) {
+        console.error("OpenAI API Error", error.response ? error.response.data : error.message);
+        res.status(500).send("Error processing your request with OpenAI API: " + (error.response ? error.response.data.error : error.message));
+    }
+});
 
 const flashcardSchema = new mongoose.Schema({
     term: { type: String, required: true },
@@ -105,7 +107,7 @@ app.post('/flashcard_sets/:setId/cards', async (req, res) => {
         };
         flashcardSet.cards.push(newCard);
         await flashcardSet.save();
-        const savedCard = flashcardSet.cards[flashcardSet.cards.length - 1]; // Get the newly added card with _id
+        const savedCard = flashcardSet.cards[flashcardSet.cards.length - 1]; 
         res.status(201).send(savedCard);
     } catch (error) {
         res.status(400).send(error);
@@ -123,33 +125,33 @@ app.get('/flashcard_sets', async (req, res) => {
 });
 
 app.get('/flashcard_sets/:id', async (req, res) => {
-    const { id } = req.params;  // Extract the ID from the URL parameter
+    const { id } = req.params; 
     try {
-        const flashcardSet = await FlashcardSet.findById(id);  // Use mongoose to find by ID
+        const flashcardSet = await FlashcardSet.findById(id); 
         if (!flashcardSet) {
-            return res.status(404).send('Flashcard set not found');  // Return 404 if no set is found
+            return res.status(404).send('Flashcard set not found'); 
         }
-        res.send(flashcardSet);  // Send the found flashcard set
+        res.send(flashcardSet); 
     } catch (error) {
         console.error('Failed to fetch flashcard set:', error);
-        res.status(500).send('Internal Server Error');  // Handle possible errors
+        res.status(500).send('Internal Server Error');  
     }
 });
 
 app.patch('/flashcard_sets/:id', async (req, res) => {
-    const updates = req.body; // the updates could include any combination of title, description, and cards
+    const updates = req.body;
     try {
         const flashcardSet = await FlashcardSet.findByIdAndUpdate(
             req.params.id, 
-            { $set: updates }, // Apply only the changes specified in the request body
+            { $set: updates },
             { new: true, runValidators: true }
         );
         if (!flashcardSet) {
-            return res.status(404).send(); // If no flashcard set is found, send a 404 response
+            return res.status(404).send(); 
         }
-        res.send(flashcardSet); // Send back the updated flashcard set
+        res.send(flashcardSet); 
     } catch (error) {
-        res.status(400).send(error); // If an error occurs, send a 400 response with the error
+        res.status(400).send(error); 
     }
 });
 
@@ -194,10 +196,8 @@ app.delete('/flashcard_sets/:setId/cards/:cardId', async (req, res) => {
             return res.status(404).send('Flashcard set not found');
         }
 
-        // Filter out the card that needs to be deleted instead of trying to remove it directly
         flashcardSet.cards = flashcardSet.cards.filter(card => card._id.toString() !== req.params.cardId);
         
-        // Save the modified document
         await flashcardSet.save();
         res.status(204).send();
     } catch (error) {
