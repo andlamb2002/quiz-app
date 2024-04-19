@@ -84,12 +84,14 @@ function View() {
             </div>
             <div className="w-3/5 mx-auto">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-white text-3xl">{flashcardSet.title}</h2>
-                    <Link to={`/edit/${setId}`} className="bg-button text-white text-xl py-2 px-4 rounded flex items-center shadow-lg">
-                        <MdEdit className="h-8 w-8 mr-2" /> Edit Set
+                    <h2 className="text-white text-3xl break-words overflow-hidden text-overflow-ellipsis" style={{ maxWidth: 'calc(100% - 96px)' }}>
+                        {flashcardSet.title}
+                    </h2>
+                    <Link to={`/edit/${setId}`} className="bg-button text-white text-xl p-2 rounded flex items-center shadow-lg hover:bg-opacity-75">
+                        <MdEdit className="h-8 w-8"/>
                     </Link>
                 </div>
-                <p className="text-white text-xl">{flashcardSet.description}</p>
+                <p className="text-white text-xl break-words pb-8">{flashcardSet.description}</p>
             </div>
             <ul className="divide-y divide-bg w-3/5 mx-auto shadow-lg">
                 {flashcardSet.cards.map((card) => (
@@ -110,14 +112,14 @@ function View() {
                                 placeholder="Enter definition"
                             />
                         </div>
-                        <button onClick={() => toggleStarred(card)} className="text-button">
+                        <button onClick={() => toggleStarred(card)} className="text-button hover:text-opacity-75">
                             {card.starred ? <MdStar className="h-8 w-8" /> : <MdStarBorder className="h-8 w-8" />}
                         </button>
                     </li>
                 ))}
             </ul>
             <div className="mx-auto">
-                <button onClick={handleAddCard} className="bg-button text-white text-3xl py-2 px-4 rounded m-4 shadow-lg">
+                <button onClick={handleAddCard} className="bg-button text-white text-5xl py-2 px-4 rounded m-4 shadow-lg hover:bg-opacity-75">
                     Add Card
                 </button>
             </div>

@@ -5,15 +5,26 @@ import logo from '../Assets/Logo.jpg';
 const Header = ({ flashcardSets }) => {
     const location = useLocation();
     
+    const truncateText = (text, maxLength = 28) => {
+        if (text.length > maxLength) {
+            return text.substring(0, maxLength) + '...';  
+        }
+        return text;
+    };
+
     const getTitle = () => {
         if (location.pathname === "/") {
-            return "Study Sets";
+            return truncateText("Study Sets");
         } else if (location.pathname.startsWith("/view/")) {
             const setId = location.pathname.split("/")[2];
             const set = flashcardSets.find(set => set._id === setId);
-            return set ? set.title : "View Set";  
+            return set ? truncateText(set.title) : truncateText("View Set");  
         } else if (location.pathname.startsWith("/edit/")) {
-            return location.pathname === "/edit/new" ? "Create Set" : "Edit Set";
+            if (location.pathname === "/edit/new") {
+                return truncateText("Create Set");
+            } else {
+                return truncateText("Edit Set");
+            }
         }
         return "";
     };
