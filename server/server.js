@@ -18,17 +18,18 @@ app.post('/generate-answers', async (req, res) => {
     if (!term || !definition) {
         return res.status(400).send("Please provide both term and definition.");
     }
-    const query = `${term}\n${definition}`;
+
+    const formattedDefinition = definition.trim().endsWith('.') ? definition.trim() : definition.trim() + '.';
 
     try {
         const apiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
             model: "gpt-3.5-turbo",
             messages: [
-                {"role": "system", "content": "With the given term and a definition, create 3 fake multiple choice answers based off of the definition:"},
-                {"role": "user", "content": query}
+                {"role": "system", "content": "With the given definition, create 3 incorrect multiple choice answers labeled A) B) C) based off of the definition, similar length of definition."},
+                {"role": "user", "content": formattedDefinition}
             ],
-            temperature: 0.5,
-            max_tokens: 128,
+            temperature: 1,  
+            max_tokens: 128,   
             top_p: 1,
             frequency_penalty: 0,
             presence_penalty: 0,
@@ -43,16 +44,20 @@ app.post('/generate-answers', async (req, res) => {
             throw new Error("Invalid or empty API response");
         }
 
-        const choices = apiResponse.data.choices;
-        const message = choices[0].message;
-        if (!message) {
-            throw new Error("Message object is undefined");
-        }
+        const generatedAnswers = apiResponse.data.choices[0].message.content;
+        const wrongAnswers = generatedAnswers.split('\n').map(answer => {
+            let trimmedAnswer = answer.trim().replace(/^[a-z]\) /i, '');
+            return trimmedAnswer.endsWith('.') ? trimmedAnswer : trimmedAnswer + '.';
+        });
 
-        const answers = message.content;
-        res.json({question: query, answers: answers});
+        res.json({
+            term: term,
+            correctDefinition: formattedDefinition,
+            incorrectAnswers: wrongAnswers
+        });
+
     } catch (error) {
-        console.error("OpenAI API Error", error.response ? error.response.data : error.message);
+        console.error("OpenAI API Error", error);
         res.status(500).send("Error processing your request with OpenAI API: " + (error.response ? error.response.data.error : error.message));
     }
 });
