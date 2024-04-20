@@ -4,6 +4,7 @@ import Home from './Components/Home';
 import Edit from './Components/Edit';
 import View from './Components/View';
 import Header from './Components/Header';
+import Quiz from './Components/Quiz';
 import axios from 'axios';
 
 function App() {
@@ -56,6 +57,7 @@ function App() {
                         <Route path="/" element={<Home flashcardSets={flashcardSets} onAddNew={handleAddNew} onEdit={handleEdit} onDelete={handleDelete} />} exact />
                         <Route path="/edit/:setId" element={<Edit onSave={handleSave} />} />
                         <Route path="/view/:setId" element={<View />} />
+                        <Route path="/quiz/:setId" element={<Quiz />} />
                     </Routes>
                 </div>
             </div>

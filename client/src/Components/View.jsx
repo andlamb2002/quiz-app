@@ -80,7 +80,7 @@ function View() {
     return (
         <div className="flex flex-col">
             <div className="flex-grow">
-                <Flashcard cards={flashcardSet.cards} />
+                <Flashcard cards={flashcardSet.cards} setId={setId}/>
             </div>
             <div className="w-3/5 mx-auto">
                 <div className="flex justify-between items-center mb-4">

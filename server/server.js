@@ -62,6 +62,59 @@ app.post('/generate-answers', async (req, res) => {
     }
 });
 
+app.post('/generate-quiz/:setId', async (req, res) => {
+    try {
+        const setId = req.params.setId;
+        const flashcardSet = await FlashcardSet.findById(setId);
+        if (!flashcardSet) {
+            return res.status(404).send('Flashcard set not found');
+        }
+
+        const quizQuestions = await Promise.all(flashcardSet.cards.map(async (card) => {
+            const formattedDefinition = card.definition.trim().endsWith('.') ? card.definition.trim() : card.definition.trim() + '.';
+            const apiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
+                model: "gpt-3.5-turbo",
+                messages: [
+                    {"role": "system", "content": "With the given definition, create 3 incorrect multiple choice answers labeled A) B) C) based off of the definition, similar length of definition."},
+                    {"role": "user", "content": formattedDefinition}
+                ],
+                temperature: 1,
+                max_tokens: 128,
+                top_p: 1,
+                frequency_penalty: 0,
+                presence_penalty: 0,
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!apiResponse || !apiResponse.data || !apiResponse.data.choices || !apiResponse.data.choices.length) {
+                throw new Error("Invalid or empty API response for term: " + card.term);
+            }
+
+            const generatedAnswers = apiResponse.data.choices[0].message.content;
+            const wrongAnswers = generatedAnswers.split('\n').map(answer => {
+                let trimmedAnswer = answer.trim().replace(/^[a-z]\) /i, '');
+                return trimmedAnswer.endsWith('.') ? trimmedAnswer : trimmedAnswer + '.';
+            });
+
+            return {
+                term: card.term,
+                correctDefinition: formattedDefinition,
+                incorrectAnswers: wrongAnswers
+            };
+        }));
+
+        res.json(quizQuestions);
+    } catch (error) {
+        console.error("OpenAI API Error", error);
+        res.status(500).send("Error processing your request: " + (error.response ? error.response.data.error : error.message));
+    }
+});
+
+
 const flashcardSchema = new mongoose.Schema({
     term: { type: String, required: true },
     definition: { type: String, required: true },

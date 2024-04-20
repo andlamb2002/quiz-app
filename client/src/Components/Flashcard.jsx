@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MdArrowBack, MdArrowForward, MdShuffle } from 'react-icons/md'; 
 
-function Flashcard({ cards }) {
+function Flashcard({ cards, setId }) {
+    const navigate = useNavigate();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [showTerm, setShowTerm] = useState(true); 
     const [shuffledCards, setShuffledCards] = useState([...cards]);
@@ -70,7 +72,9 @@ function Flashcard({ cards }) {
                         <MdArrowForward className="h-8 w-8" />
                     </button>
                 </div>
-                <button className="bg-button text-white text-3xl py-2 px-4 rounded flex items-center shadow-lg hover:bg-opacity-75">
+                <button
+                    onClick={() => navigate(`/quiz/${setId}`)}
+                    className="bg-button text-white text-3xl py-2 px-4 rounded flex items-center shadow-lg hover:bg-opacity-75">
                     Test
                 </button>
             </div>
