@@ -62,7 +62,7 @@ app.post('/generate-answers', async (req, res) => {
     }
 });
 
-app.post('/generate-quiz/:setId', async (req, res) => {
+app.get('/generate-quiz/:setId', async (req, res) => {
     try {
         const setId = req.params.setId;
         const flashcardSet = await FlashcardSet.findById(setId);
@@ -75,7 +75,7 @@ app.post('/generate-quiz/:setId', async (req, res) => {
             const apiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
                 model: "gpt-3.5-turbo",
                 messages: [
-                    {"role": "system", "content": "With the given definition, create 3 incorrect multiple choice answers labeled A) B) C) based off of the definition, similar length of definition."},
+                    {"role": "system", "content": "With the given definition, create 3 incorrect multiple choice answers labeled A) B) C) based off of the definition."},
                     {"role": "user", "content": formattedDefinition}
                 ],
                 temperature: 1,
@@ -97,8 +97,8 @@ app.post('/generate-quiz/:setId', async (req, res) => {
             const generatedAnswers = apiResponse.data.choices[0].message.content;
             const wrongAnswers = generatedAnswers.split('\n').map(answer => {
                 let trimmedAnswer = answer.trim().replace(/^[a-z]\) /i, '');
-                return trimmedAnswer.endsWith('.') ? trimmedAnswer : trimmedAnswer + '.';
-            });
+                return trimmedAnswer && trimmedAnswer !== "." ? (trimmedAnswer.endsWith('.') ? trimmedAnswer : trimmedAnswer + '.') : null;
+            }).filter(Boolean);
 
             return {
                 term: card.term,
@@ -113,7 +113,6 @@ app.post('/generate-quiz/:setId', async (req, res) => {
         res.status(500).send("Error processing your request: " + (error.response ? error.response.data.error : error.message));
     }
 });
-
 
 const flashcardSchema = new mongoose.Schema({
     term: { type: String, required: true },

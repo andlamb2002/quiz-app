@@ -12,19 +12,18 @@ const Quiz = () => {
     useEffect(() => {
         const fetchQuestions = async () => {
             try {
-                console.log(setId);
-                const { data } = await axios.get(`http://localhost:5000//generate-quiz/${setId}`); 
-                setQuestions(data.cards.map(card => ({
+                const { data } = await axios.get(`http://localhost:5000/generate-quiz/${setId}`);
+                setQuestions(data.map(card => ({
                     term: card.term,
-                    options: [card.definition, ...card.incorrectAnswers],
-                    correct: card.definition
+                    options: [card.correctDefinition, ...card.incorrectAnswers],
+                    correct: card.correctDefinition
                 })));
             } catch (error) {
                 console.error('Failed to fetch questions:', error);
             }
         };
         fetchQuestions();
-    }, [setId]);
+    }, [setId]);    
 
     const handleSubmit = () => {
         let newScore = 0;
