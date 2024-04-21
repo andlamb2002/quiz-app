@@ -25,6 +25,8 @@ const Header = ({ flashcardSets }) => {
             } else {
                 return truncateText("Edit Set");
             }
+        } else if (location.pathname.startsWith("/quiz/")) {
+            return "Quiz";
         }
         return "";
     };
