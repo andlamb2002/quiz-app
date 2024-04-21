@@ -52,11 +52,12 @@ function Flashcard({ cards, setId }) {
 
     return (
         <div className="bg-bg1 flex flex-col items-center pt-10 mb-4">
-            <div className="w-3/5 bg-bg2 p-8 rounded-lg shadow-xl relative cursor-pointer" onClick={handleCardClick}>
-                <div className="text-white text-center text-5xl my-32">
+            <div className="w-3/5 bg-bg2 p-8 rounded-lg shadow-xl relative items-center cursor-pointer" onClick={handleCardClick}>
+                <div className={`text-white text-center ${showTerm ? 'text-5xl' : 'text-3xl'} h-80 flex justify-center items-center break-all overflow-auto mx-auto px-4 py-2`}>
                     {showTerm ? card.term : card.definition}
                 </div>
             </div>
+
             <div className="flex items-center justify-between w-3/5 my-4">
                 <button onClick={handleShuffle} className="bg-button text-white text-3xl p-2 rounded flex items-center shadow-lg hover:bg-opacity-75">
                     <MdShuffle className="h-8 w-8" />
