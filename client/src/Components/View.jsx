@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import Flashcard from './Flashcard';
-import { MdStarBorder, MdStar, MdEdit } from 'react-icons/md';
+import { MdStarBorder, MdStar, MdEdit, } from 'react-icons/md';
 
 function View() {
     const { setId } = useParams();
     const [flashcardSet, setFlashcardSet] = useState(null);
+    const [showOnlyStarred, setShowOnlyStarred] = useState(false);  
 
     useEffect(() => {
         const fetchData = async () => {
@@ -60,6 +61,16 @@ function View() {
         }
     };
 
+    const areStarredCardsAvailable = () => {
+        return flashcardSet && flashcardSet.cards.some(card => card.starred);
+    };
+
+    const toggleFilterStarred = () => {
+        if (areStarredCardsAvailable()) {
+            setShowOnlyStarred(!showOnlyStarred);
+        }
+    };
+
     const handleAddCard = async () => {
         const newCard = { term: 'New Term', definition: 'New Definition', starred: false };
         try {
@@ -80,7 +91,13 @@ function View() {
     return (
         <div className="flex flex-col">
             <div className="flex-grow">
-                <Flashcard cards={flashcardSet.cards} setId={setId}/>
+                <Flashcard 
+                    cards={showOnlyStarred ? flashcardSet.cards.filter(card => card.starred) : flashcardSet.cards} 
+                    setId={setId} 
+                    toggleFilterStarred={toggleFilterStarred} 
+                    showOnlyStarred={showOnlyStarred}
+                    areStarredCardsAvailable={areStarredCardsAvailable()}
+                />            
             </div>
             <div className="w-3/5 mx-auto">
                 <div className="flex justify-between items-center mb-4">

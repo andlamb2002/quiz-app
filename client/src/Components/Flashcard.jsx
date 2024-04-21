@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MdArrowBack, MdArrowForward, MdShuffle } from 'react-icons/md'; 
+import { MdArrowBack, MdArrowForward, MdShuffle, MdStar, MdStarBorder } from 'react-icons/md'; 
 
-function Flashcard({ cards, setId }) {
+function Flashcard({ cards, setId, toggleFilterStarred, showOnlyStarred, areStarredCardsAvailable }) {
     const navigate = useNavigate();
     const [currentIndex, setCurrentIndex] = useState(0);
     const [showTerm, setShowTerm] = useState(true); 
@@ -59,9 +59,14 @@ function Flashcard({ cards, setId }) {
             </div>
 
             <div className="flex items-center justify-between w-3/5 my-4">
-                <button onClick={handleShuffle} className="bg-button text-white text-3xl p-2 rounded flex items-center shadow-lg hover:bg-opacity-75">
-                    <MdShuffle className="h-8 w-8" />
-                </button>
+                <div className="flex space-x-4">
+                    <button onClick={handleShuffle} className="bg-button text-white text-3xl p-2 rounded flex items-center shadow-lg hover:bg-opacity-75">
+                        <MdShuffle className="h-8 w-8" />
+                    </button>
+                    <button disabled={!areStarredCardsAvailable} onClick={toggleFilterStarred} className="bg-button text-white text-3xl p-2 rounded flex items-center shadow-lg hover:bg-opacity-75">
+                        {showOnlyStarred ? <MdStar className="h-8 w-8" /> : <MdStarBorder className="h-8 w-8" />}
+                    </button>
+                </div>
                 <div className="flex items-center space-x-4">
                     <button onClick={handlePrev} disabled={currentIndex === 0} className="text-white">
                         <MdArrowBack className="h-8 w-8" />
@@ -75,7 +80,7 @@ function Flashcard({ cards, setId }) {
                 </div>
                 <button
                     onClick={() => navigate(`/quiz/${setId}`)}
-                    className="bg-button text-white text-3xl py-2 px-4 rounded flex items-center shadow-lg hover:bg-opacity-75">
+                    className="bg-button text-white text-3xl ml-2 py-2 px-6 rounded flex items-center shadow-lg hover:bg-opacity-75">
                     Test
                 </button>
             </div>
