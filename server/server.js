@@ -13,55 +13,6 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-app.post('/generate-answers', async (req, res) => {
-    const { term, definition } = req.body;
-    if (!term || !definition) {
-        return res.status(400).send("Please provide both term and definition.");
-    }
-
-    const formattedDefinition = definition.trim().endsWith('.') ? definition.trim() : definition.trim() + '.';
-
-    try {
-        const apiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
-            model: "gpt-3.5-turbo",
-            messages: [
-                {"role": "system", "content": "With the given definition, create 3 incorrect multiple choice answers labeled A) B) C) based off of the definition, similar length of definition."},
-                {"role": "user", "content": formattedDefinition}
-            ],
-            temperature: 1,  
-            max_tokens: 128,   
-            top_p: 1,
-            frequency_penalty: 0,
-            presence_penalty: 0,
-        }, {
-            headers: {
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-                'Content-Type': 'application/json'
-            }
-        });
-
-        if (!apiResponse || !apiResponse.data || !apiResponse.data.choices || !apiResponse.data.choices.length) {
-            throw new Error("Invalid or empty API response");
-        }
-
-        const generatedAnswers = apiResponse.data.choices[0].message.content;
-        const wrongAnswers = generatedAnswers.split('\n').map(answer => {
-            let trimmedAnswer = answer.trim().replace(/^[a-z]\) /i, '');
-            return trimmedAnswer.endsWith('.') ? trimmedAnswer : trimmedAnswer + '.';
-        });
-
-        res.json({
-            term: term,
-            correctDefinition: formattedDefinition,
-            incorrectAnswers: wrongAnswers
-        });
-
-    } catch (error) {
-        console.error("OpenAI API Error", error);
-        res.status(500).send("Error processing your request with OpenAI API: " + (error.response ? error.response.data.error : error.message));
-    }
-});
-
 app.get('/generate-quiz/:setId', async (req, res) => {
     try {
         const setId = req.params.setId;
@@ -75,8 +26,14 @@ app.get('/generate-quiz/:setId', async (req, res) => {
             const apiResponse = await axios.post('https://api.openai.com/v1/chat/completions', {
                 model: "gpt-3.5-turbo",
                 messages: [
-                    {"role": "system", "content": "With the given definition, create 3 incorrect multiple choice answers labeled A) B) C) based off of the definition."},
-                    {"role": "user", "content": formattedDefinition}
+                    {
+                        "role": "system",
+                        "content": `With the term '${card.term}' and its definition '${formattedDefinition}', create 3 incorrect multiple choice answers labeled A) B) C) based off of the definition, maintaining a similar length and complexity.`
+                    },
+                    {
+                        "role": "user",
+                        "content": formattedDefinition
+                    }
                 ],
                 temperature: 1,
                 max_tokens: 128,
@@ -113,6 +70,7 @@ app.get('/generate-quiz/:setId', async (req, res) => {
         res.status(500).send("Error processing your request: " + (error.response ? error.response.data.error : error.message));
     }
 });
+
 
 const flashcardSchema = new mongoose.Schema({
     term: { type: String, required: true },
